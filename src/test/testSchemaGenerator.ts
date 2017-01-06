@@ -305,6 +305,29 @@ describe('generating schema from shorthand', () => {
     expect(jsSchema.getQueryType().name).to.equal('Query');
   });
 
+  it('throws on conflicting DefinitionNodes', () => {
+    const typeDefAry = [`
+      type Query {
+        foo: String
+      }
+      `, `
+      type Query {
+        foo: Int
+      }
+      `, `
+      schema {
+        query: Query
+      }
+      `, `
+      schema {
+        query: Query
+      }
+    `];
+
+
+    expect(() => makeExecutableSchema({ typeDefs: typeDefAry, resolvers: {} })).to.throw('Conflicting type definitions defined');
+  });
+
   it('works with imports, even circular ones', () => {
     const typeDefAry = [`
       type Query {
